@@ -51,3 +51,6 @@ Set the SendGrid API Key in the User Secrets store:
 ```bash
 dotnet user-secrets set SendGridApiKey [PASTE IN YOUR SENDGRID API KEY]
 ```
+
+
+dotnet add package SendGrid.Extensions.DependencyInjection

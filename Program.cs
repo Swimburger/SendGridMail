@@ -3,9 +3,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using SendGrid.Extensions.DependencyInjection;
 
-using IHost host = Host.CreateDefaultBuilder(args).Build();
+using IHost host = Host.CreateDefaultBuilder(args)
+    .ConfigureServices((context, services) => services.AddSendGrid(options => 
+        options.ApiKey = context.Configuration.GetValue<string>("SendGridApiKey")
+    ))
+    .Build();
 var config = host.Services.GetRequiredService<IConfiguration>();
+
 
 var apiKey = config.GetValue<string>("SendGridApiKey");
 var fromEmail = config.GetValue<string>("FromEmail");
@@ -14,16 +20,16 @@ if(string.IsNullOrEmpty(apiKey)) throw new Exception("SendGridApiKey should not 
 if(string.IsNullOrEmpty(fromEmail)) throw new Exception("FromEmail should not be null or empty");
 if(string.IsNullOrEmpty(fromName)) throw new Exception("FromName should not be null or empty");
 
-Console.Write("To:");
+Console.Write("To: ");
 var toEmail = Console.ReadLine();
 
-Console.Write("Subject:");
+Console.Write("Subject: ");
 var subject = Console.ReadLine();
 
-Console.Write("Body:");
+Console.Write("Body: ");
 var body = Console.ReadLine();
 
-var client = new SendGridClient(apiKey);
+var client = host.Services.GetRequiredService<ISendGridClient>();
 var msg = new SendGridMessage()
 {
     From = new EmailAddress(fromEmail, fromName),
