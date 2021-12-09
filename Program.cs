@@ -1,16 +1,36 @@
-﻿using SendGrid;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using SendGrid;
 using SendGrid.Helpers.Mail;
 
-var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+using IHost host = Host.CreateDefaultBuilder(args).Build();
+var config = host.Services.GetRequiredService<IConfiguration>();
+
+var apiKey = config.GetValue<string>("SendGridApiKey");
+var fromEmail = config.GetValue<string>("FromEmail");
+var fromName = config.GetValue<string>("FromName");
+if(string.IsNullOrEmpty(apiKey)) throw new Exception("SendGridApiKey should not be null or empty");
+if(string.IsNullOrEmpty(fromEmail)) throw new Exception("FromEmail should not be null or empty");
+if(string.IsNullOrEmpty(fromName)) throw new Exception("FromName should not be null or empty");
+
+Console.Write("To:");
+var toEmail = Console.ReadLine();
+
+Console.Write("Subject:");
+var subject = Console.ReadLine();
+
+Console.Write("Body:");
+var body = Console.ReadLine();
+
 var client = new SendGridClient(apiKey);
 var msg = new SendGridMessage()
 {
-    From = new EmailAddress("[REPLACE WITH YOUR EMAIL]", "[REPLACE WITH YOUR NAME]"),
-    Subject = "Sending with Twilio SendGrid is Fun",
-    PlainTextContent = "and easy to do anywhere, even with C#",
-    HtmlContent = "<strong>and easy to do anywhere, even with C#</strong>",
+    From = new EmailAddress(fromEmail, fromName),
+    Subject = subject,
+    PlainTextContent = body
 };
-msg.AddTo(new EmailAddress("[REPLACE WITH DESIRED TO EMAIL]", "[REPLACE WITH DESIRED TO NAME]"));
+msg.AddTo(new EmailAddress(toEmail));
 var response = await client.SendEmailAsync(msg);
 
 // A success status code means SendGrid received the email request and will process it.
