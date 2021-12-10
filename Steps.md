@@ -36,14 +36,14 @@ Add the following packages:
 ```bash
 dotnet add package Microsoft.Extensions.Hosting
 dotnet add package Microsoft.Extensions.Configuration.UserSecret
-``
+```
 
 Update code
 
 Create appsettings.json.
 
 Initialize user-secrets for your project:
-```
+```bash
 dotnet user-secrets init
 ```
 
@@ -51,6 +51,8 @@ Set the SendGrid API Key in the User Secrets store:
 ```bash
 dotnet user-secrets set SendGridApiKey [PASTE IN YOUR SENDGRID API KEY]
 ```
+
+dotnet run --environment Development
 
 
 dotnet add package SendGrid.Extensions.DependencyInjection
